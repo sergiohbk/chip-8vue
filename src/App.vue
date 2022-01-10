@@ -1,15 +1,22 @@
 <template>
   <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <canvas id="canvas"></canvas>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import {Chip8} from './components/Chip8.js';
 export default {
   name: 'App',
+  
+  mounted() {
+    const chip8 = new Chip8();
+    chip8.memory.setMemory(0x25,0xFF);
+    const result = chip8.memory.getMemory(0x25);
+    console.log(result);
+  },
+  
   components: {
-    HelloWorld
+
   }
 }
 </script>
