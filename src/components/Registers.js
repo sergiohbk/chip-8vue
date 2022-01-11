@@ -1,5 +1,5 @@
 import { LOAD_PROGRAM_ADDRESS_SIZE } from "./variables/MemoryConstants";
-import { NUMBER_OF_REGISTERS } from "./variables/RegisterConstants";
+import { NUMBER_OF_REGISTERS, STACK_PROFUNDIDAD } from "./variables/RegisterConstants";
 
 export class Registers{
     constructor(){

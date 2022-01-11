@@ -30,10 +30,10 @@ export class Display{
     }
     drawPixel(x, y, value){
         if(typeof value !== 'undefined' || value !== null){
-            console.log("drawing pixel at " + x + "," + y);
+            //console.log("drawing pixel at " + x + "," + y);
             this.graphics.fillStyle = COLOR;
         }else{
-            console.log("clearing pixel at " + x + "," + y);
+            //console.log("clearing pixel at " + x + "," + y);
             this.graphics.fillStyle = BG_COLOR;
         }
         this.graphics.fillRect(x * DISPLAY_MULTIPLY,y * DISPLAY_MULTIPLY, DISPLAY_MULTIPLY, DISPLAY_MULTIPLY);

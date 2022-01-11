@@ -11,4 +11,8 @@ export class Chip8{
         this.registers = new Registers();
         this.keyboard = new Keyboard();
     }
+
+    sleep(ms = 500){
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 }
