@@ -9,18 +9,12 @@ export default {
   name: 'App',
   
   mounted() {
-    this.runChip8();
+    const chip8 = new Chip8();
+    this.runChip8(chip8);
   },
   methods: {
-    async runChip8(){
-      const chip8 = new Chip8();
-      let update = 1;
-      while(update){
-        const keydown = chip8.keyboard.haskeyDown();
-        const iskeydown = chip8.keyboard.iskeyDown(1);
-        console.log(keydown, iskeydown);
-        await chip8.sleep();
-      }
+    async runChip8(chip8){
+      chip8.display.drawSprite(0,0,0,5) 
     }
   },
   
