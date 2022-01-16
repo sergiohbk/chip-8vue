@@ -14,7 +14,23 @@ export default {
   },
   methods: {
     async runChip8(chip8){
-      chip8.display.drawSprite(0,0,0,5) 
+      let loop = true
+      chip8.registers.ST = 0x10;
+      while(loop){
+        await chip8.sleep(200)
+        if(chip8.registers.DT > 0){
+          await chip8.sleep()
+          chip8.registers.DT--
+        }
+        if(chip8.registers.ST > 0){
+          chip8.soundcard.enableSound()
+          await chip8.sleep()
+          chip8.registers.ST--
+        }
+        if(chip8.registers.ST == 0){
+          chip8.soundcard.disableSound()
+        }
+      } 
     }
   },
   

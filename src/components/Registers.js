@@ -5,8 +5,8 @@ export class Registers{
     constructor(){
         this.V = new Uint8Array(NUMBER_OF_REGISTERS); //el ultimo byte es una flag
         this.I = 0; //2 bytes
-        this.delaytimer = 0; //1 byte
-        this.soundtimer = 0; //1 byte
+        this.DT = 0; //1 byte
+        this.ST = 0; //1 byte
         this.PC = LOAD_PROGRAM_ADDRESS_SIZE; //program counter 2 bytes
         this.SP = -1; //stack pointer 1 byte
         this.stack = new Uint16Array(STACK_PROFUNDIDAD); //stack de 32 bytes
