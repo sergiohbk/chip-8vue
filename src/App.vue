@@ -10,7 +10,11 @@ export default {
   
   mounted() {
     const chip8 = new Chip8();
-    this.runChip8(chip8);
+    //this.runChip8(chip8);
+    chip8.disassembler.dissasemble(0x00EE);
+    chip8.disassembler.dissasemble(0x1FFE);
+    chip8.disassembler.dissasemble(0x212E);
+    chip8.disassembler.dissasemble(0x35FE);
   },
   methods: {
     async runChip8(chip8){

@@ -6,6 +6,7 @@ import { SPRITE_GROUP } from './variables/SpriteGroupConstants.js';
 import { SPRITE_GROUP_ADDRESS } from './variables/MemoryConstants.js';
 import { TIMER60HZ } from './variables/RegisterConstants.js';
 import { SoundCard } from './SoundCard.js';
+import { Disassembler } from './Disassembler.js';
 
 export class Chip8{
     constructor(){
@@ -16,6 +17,7 @@ export class Chip8{
         this.keyboard = new Keyboard();
         this.display = new Display(this.memory.memory);
         this.soundcard = new SoundCard();
+        this.disassembler = new Disassembler();
     }
 
     sleep(ms = TIMER60HZ){
