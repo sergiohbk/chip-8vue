@@ -17,7 +17,7 @@ export class Display{
         for (let i = 0; i < DISPLAY_HEIGHT; i++) {
             this.frameBuffer.push([]);
             for (let j = 0; j < DISPLAY_WIDTH; j++) {
-                this.frameBuffer[i].push();
+                this.frameBuffer[i].push(0);
             }
         }
         this.graphics.fillStyle = BG_COLOR;
@@ -31,7 +31,7 @@ export class Display{
         }
     }
     drawPixel(x, y, value){
-        if(value){
+        if(value === 1){
             //console.log("drawing pixel at " + x + "," + y);
             this.graphics.fillStyle = COLOR;
         }else{

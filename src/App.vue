@@ -5,36 +5,24 @@
 
 <script>
 import {Chip8} from './components/Chip8.js';
+
 export default {
   name: 'App',
   
   mounted() {
-    const chip8 = new Chip8();
-    //this.runChip8(chip8);
-    chip8.disassembler.dissasemble(0x00EE);
-    chip8.disassembler.dissasemble(0x1FFE);
-    chip8.disassembler.dissasemble(0x212E);
-    chip8.disassembler.dissasemble(0x35FE);
+    this.runChip8();
   },
   methods: {
-    async runChip8(chip8){
-      let loop = true
-      chip8.registers.ST = 0x10;
-      while(loop){
-        await chip8.sleep(200)
-        if(chip8.registers.DT > 0){
-          await chip8.sleep()
-          chip8.registers.DT--
-        }
-        if(chip8.registers.ST > 0){
-          chip8.soundcard.enableSound()
-          await chip8.sleep()
-          chip8.registers.ST--
-        }
-        if(chip8.registers.ST == 0){
-          chip8.soundcard.disableSound()
-        }
-      } 
+    async runChip8(){
+      const rom = await fetch('./rom/test.ch8'); //hay que meterlo en public porque fetch es especialito, en fin xD
+      const buffer = await rom.arrayBuffer();
+      const rombuffer = new Uint8Array(buffer);
+      const chip8 = new Chip8(rombuffer);
+      chip8.execute(0x1006);
+      console.log(chip8.registers.PC);
+      chip8.execute(0x2001);
+      console.log(chip8.registers.stack);
+      console.log(chip8.registers.PC);
     }
   },
   

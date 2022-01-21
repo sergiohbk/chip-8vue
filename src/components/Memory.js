@@ -19,6 +19,12 @@ export class Memory{
         return this.memory[address];
     }
 
+    getOpcode(address){
+        const highbyte = this.getMemory(address);
+        const lowbyte = this.getMemory(address + 1);
+        return (highbyte << 8) | lowbyte;
+    }
+
     assertMemory(address){
         console.assert(address >= 0 && address < MEMORY_SIZE, "Memoria fuera de rango " + address);
     }
