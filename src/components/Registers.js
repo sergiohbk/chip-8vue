@@ -3,7 +3,7 @@ import { NUMBER_OF_REGISTERS, STACK_PROFUNDIDAD } from "./variables/RegisterCons
 
 export class Registers{
     constructor(){
-        this.V = new Uint8Array(NUMBER_OF_REGISTERS); //el ultimo byte es una flag
+        this.V = new Uint8Array(NUMBER_OF_REGISTERS); //el ultimo byte es una flag llamada VF
         this.I = 0; //2 bytes
         this.DT = 0; //1 byte
         this.ST = 0; //1 byte

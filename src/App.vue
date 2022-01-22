@@ -18,11 +18,12 @@ export default {
       const buffer = await rom.arrayBuffer();
       const rombuffer = new Uint8Array(buffer);
       const chip8 = new Chip8(rombuffer);
-      chip8.execute(0x1006);
-      console.log(chip8.registers.PC);
-      chip8.execute(0x2001);
-      console.log(chip8.registers.stack);
-      console.log(chip8.registers.PC);
+      chip8.execute(0x600B);
+      chip8.execute(0x6505);
+      chip8.execute(0x680A);
+      chip8.execute(0xF029);
+      console.log(chip8.registers.I);
+      chip8.execute(0xD585);
     }
   },
   

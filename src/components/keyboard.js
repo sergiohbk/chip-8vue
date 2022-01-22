@@ -32,6 +32,6 @@ export class Keyboard{
     
     haskeyDown(){
         //funcion para saber si hay alguna tecla presionada
-        return this.keys.findIndex((key) => key) != -1;
+        return this.keys.findIndex((key) => key);
     }
 }
