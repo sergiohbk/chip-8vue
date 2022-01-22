@@ -7,6 +7,7 @@ import { LOAD_PROGRAM_ADDRESS_SIZE, MEMORY_SIZE, SPRITE_GROUP_ADDRESS } from './
 import { TIMER60HZ } from './variables/RegisterConstants.js';
 import { SoundCard } from './SoundCard.js';
 import { Disassembler } from './Disassembler.js';
+import { SPRITE_HEIGHT_DEFAULT } from './variables/DisplayConstants.js';
 
 export class Chip8{
     constructor(rombuffer){
@@ -32,7 +33,7 @@ export class Chip8{
         this.memory.memory.set(rombuffer, LOAD_PROGRAM_ADDRESS_SIZE);
         this.registers.PC = LOAD_PROGRAM_ADDRESS_SIZE;
     }
-    execute(opcode){
+    async execute(opcode){
         const {instruction, args} = this.disassembler.dissasemble(opcode);
         switch(instruction.id) {
             default:
@@ -77,6 +78,148 @@ export class Chip8{
                 this.registers.V[args[0]] = args[1];
                 //cambiamos el valor de la variable Vx por el byte indicado
                 break;
+            case 'ADD_Vx_byte':
+                this.registers.V[args[0]] += args[1];
+                //añadimos el byte indicado a la variable Vx
+                break;
+            case 'LD_Vx_Vy':
+                this.registers.V[args[0]] = this.registers.V[args[1]];
+                //cambiamos el valor de la variable Vx por el valor de la variable Vy
+                break;
+            case 'OR_Vx_Vy':
+                this.registers.V[args[0]] |= this.registers.V[args[1]];
+                //hacemos un OR entre los valores de las variables Vx y Vy y lo guardamos en la variable Vx
+                break;
+            case 'AND_Vx_Vy':
+                this.registers.V[args[0]] &= this.registers.V[args[1]];
+                //hacemos un AND entre los valores de las variables Vx y Vy y lo guardamos en la variable Vx
+                break;
+            case 'XOR_Vx_Vy':
+                this.registers.V[args[0]] ^= this.registers.V[args[1]];
+                //hacemos un XOR entre los valores de las variables Vx y Vy y lo guardamos en la variable Vx
+                break;
+            case 'ADD_Vx_Vy':{
+                let sum = this.registers.V[args[0]] + this.registers.V[args[1]];
+                this.registers.V[0xF] = sum > 0xFF ? 1 : 0; //comparamos si la suma es mayor que 255, si es asi, guardamos 1 en la variable VF
+                this.registers.V[args[0]] = sum & 0xFF; //hacemos un AND para obtener los ultimos 8 bits de la suma
+                //hacemos una suma entre los valores de las variables Vx y Vy y lo guardamos en la variable Vx damos valor a VF segun sea el caso 
+                break;
+            }
+            case 'SUB_Vx_Vy':{
+                let sub = this.registers.V[args[0]] - this.registers.V[args[1]];
+                this.registers.V[0xF] = sub < 0 ? 0 : 1; //comparamos si la resta es menor que 0, si es asi, guardamos 0 en la variable VF
+                this.registers.V[args[0]] = sub & 0xFF; //hacemos un AND para obtener los ultimos 8 bits de la resta
+                //hacemos una resta entre los valores de las variables Vx y Vy y lo guardamos en la variable Vx damos valor a VF segun sea el caso
+                break;
+            }
+            case 'SHR_Vx':{
+                this.registers.V[0xF] = this.registers.V[args[0]] & 0x1; //guardamos el bit menos significativo en la variable VF
+                this.registers.V[args[0]] >>= 1; //hacemos un shift right (igual a dividir entre 2) entre los valores de las variables Vx y Vy y lo guardamos en la variable Vx
+                break;
+            }
+            case 'SUBN_Vx_Vy':{
+                let sub = this.registers.V[args[1]] - this.registers.V[args[0]];
+                this.registers.V[0xF] = sub < 0 ? 0 : 1; //comparamos si la resta es menor que 0, si es asi, guardamos 0 en la variable VF
+                this.registers.V[args[0]] = sub & 0xFF; //hacemos un AND para obtener los ultimos 8 bits de la resta
+                //hacemos una resta entre los valores de las variables Vy y Vx y lo guardamos en la variable Vx damos valor a VF segun sea el caso
+                break;
+            }
+            case 'SHL_Vx':{
+                this.registers.V[0xF] = this.registers.V[args[0]] & 0x80; //guardamos el bit mas significativo en la variable VF
+                this.registers.V[args[0]] <<= 1; //hacemos un shift left (igual a multiplicar por 2) entre los valores de las variables Vx y Vy y lo guardamos en la variable Vx
+                break;
+            }
+            case 'SNE_Vx_Vy':
+                if(this.registers.V[args[0]] !== this.registers.V[args[1]]){
+                    this.registers.PC += 2;
+                }
+                //si el valor de la variable Vx es diferente al valor de la variable Vy, añadimos 2 al PC
+                break;
+            case 'LD_I_addr':
+                this.registers.I = args[0];
+                //cambiamos el valor de la variable I por el byte indicado
+                break;
+            case 'JP_V0_addr':
+                this.registers.PC = args[0] + this.registers.V[0];
+                //cambiamos el valor de la variable PC por el byte indicado mas el valor de la variable V0
+                break;
+            case 'RND_Vx_byte':
+                this.registers.V[args[0]] = Math.floor(Math.random() * 0xFF) & args[1];
+                //cambiamos el valor de la variable Vx por un byte aleatorio entre 0 y 255 y se suma por el byte KK
+                break;
+            case 'DRW_Vx_Vy_nibble':{
+                this.registers.V[0xF] = this.display.drawSprite(
+                    this.registers.V[args[0]], 
+                    this.registers.V[args[1]], 
+                    this.registers.I, 
+                    args[2]
+                );
+                break;
+                //dibujamos un pixel en la posicion indicada por Vx, Vy en la posicion del registro I y el largo indicado en N        
+            }
+            case 'SKP_Vx':
+                if(this.keyboard.iskeyDown(this.registers.V[args[0]])){
+                    this.registers.PC += 2;
+                }
+                //si la tecla indicada en Vx esta pulsada, añadimos 2 al PC
+                break;
+            case 'SKNP_Vx':
+                if(!this.keyboard.iskeyDown(this.registers.V[args[0]])){
+                    this.registers.PC += 2;
+                }
+                //si la tecla indicada en Vx no esta pulsada, añadimos 2 al PC
+                break;
+            case 'LD_Vx_DT':
+                this.registers.V[args[0]] = this.registers.DT;
+                //cambiamos el valor de la variable Vx por el valor de DT
+                break;
+            case 'LD_Vx_K':{
+                let keypressed = this.keyboard.haskeyDown();
+                while(keypressed === -1){
+                    await this.sleep();
+                    keypressed = this.keyboard.haskeyDown();
+                }
+                this.registers.V[args[0]] = keypressed;
+                //cambiamos el valor de la variable Vx por el valor de la tecla pulsada, esperamos con un loop a que se pulse una tecla
+                break;
+            }
+            case 'LD_DT_Vx':
+                this.registers.DT = this.registers.V[args[0]];
+                //cambiamos el valor de DT por el valor de la variable Vx
+                break;
+            case 'LD_ST_Vx':
+                this.registers.ST = this.registers.V[args[0]];
+                //cambiamos el valor de ST por el valor de la variable Vx
+                break;
+            case 'ADD_I_Vx':
+                this.registers.I += this.registers.V[args[0]];
+                //cambiamos el valor de I por el valor de la variable Vx mas el valor de I
+                break;
+            case 'LD_F_Vx':
+                console.log("entra");
+                this.registers.I = this.registers.V[args[0]] * SPRITE_HEIGHT_DEFAULT;
+                //cambiamos el valor de I por el valor de la variable Vx multiplicado por 5
+                break;
+            case 'LD_B_Vx':
+                let x = this.registers.V[args[0]];
+                const cientos = Math.floor(x % 1000);
+                const decenas = Math.floor(x % 100);
+                const unidades = Math.floor(x % 10);
+                this.memory.memory[this.registers.I] = cientos;
+                this.memory.memory[this.registers.I + 1] = decenas;
+                this.memory.memory[this.registers.I + 2] = unidades;
+                //guardamos en memoria el valor de vx en i, i+1 y i+2 cogiendo la variable vx y dividiendola entre centenas, decenas y unidades
+                break;
+            case 'LD_I_Vx':
+                for(let i = 0; i <= args[0]; i++){
+                    this.memory.memory[this.registers.I + i] = this.registers.V[i];
+                }
+                //guardamos en memoria el valor de V0 hasta Vx en la posicion de I
+                break;
+            case 'LD_Vx_I':
+                for(let i = 0; i < args[0]; i++){
+                    this.registers.V[i] = this.memory.memory[this.registers.I + i];
+                }
         }
     }
 
