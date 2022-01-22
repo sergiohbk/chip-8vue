@@ -18,12 +18,25 @@ export default {
       const buffer = await rom.arrayBuffer();
       const rombuffer = new Uint8Array(buffer);
       const chip8 = new Chip8(rombuffer);
-      chip8.execute(0x600B);
-      chip8.execute(0x6505);
-      chip8.execute(0x680A);
-      chip8.execute(0xF029);
-      console.log(chip8.registers.I);
-      chip8.execute(0xD585);
+      chip8.running = true;
+      while(chip8.running){
+        await chip8.sleep();
+        if(chip8.registers.DT > 0)
+        {
+          await chip8.sleep();
+          chip8.registers.DT--;
+        }
+        if(chip8.registers.ST > 0)
+        {
+          chip8.soundcard.enableSound();
+          await chip8.sleep();
+          chip8.registers.ST--;
+        }
+        if(chip8.registers.ST === 0){
+          chip8.soundcard.disableSound();
+        }
+        chip8.run();
+      }
     }
   },
   

@@ -7,7 +7,7 @@ export class Registers{
         this.I = 0; //2 bytes
         this.DT = 0; //1 byte
         this.ST = 0; //1 byte
-        this.PC = LOAD_PROGRAM_ADDRESS_SIZE; //program counter 2 bytes
+        this.PC = LOAD_PROGRAM_ADDRESS_SIZE; //program counter 2 bytes controla la posicion de ejecucion del programa
         this.SP = -1; //stack pointer 1 byte
         this.stack = new Uint16Array(STACK_PROFUNDIDAD); //stack de 32 bytes
         this.resetRegisters();
