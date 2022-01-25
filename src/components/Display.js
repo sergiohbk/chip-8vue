@@ -74,4 +74,12 @@ export class Display{
         this.drawBuffer();
         return pixelcolision;
     }
+    clear(){
+        this.graphics.clearRect(0, 0, this.screen.width, this.screen.height);
+        for (let y = 0; y < DISPLAY_HEIGHT; y++) {
+            for (let x = 0; x < DISPLAY_WIDTH; x++) {
+                this.frameBuffer[y][x] = 0;
+            }
+        }
+    }
 }

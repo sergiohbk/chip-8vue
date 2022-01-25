@@ -40,11 +40,6 @@ export class Chip8{
             this.opcodehigh = this.memory.memory[this.registers.PC] << 8;
             this.opcodelow = this.memory.memory[this.registers.PC + 1];
             this.opcode = this.opcodehigh | this.opcodelow;
-            if(this.opcode == 0){
-                this.running = false;
-                console.log(this.memory.memory[0x314].toString(16) + " " + (this.memory.memory[0x314] + 1).toString(16));
-                return;
-            }
             console.log("opcode: " + this.opcode.toString(16));
             this.execute(this.opcode);
         }else{
@@ -63,7 +58,7 @@ export class Chip8{
                 this.continuePC(2);
                 break;
             case 'CLS':
-                this.display.resetPixels();
+                this.display.clear();
                 //limpia la pantalla, sin mas
                 this.continuePC(2);
                 break;
@@ -229,13 +224,13 @@ export class Chip8{
                 break;
             case 'LD_Vx_K':{
                 let keypressed = this.keyboard.haskeyDown();
-                while(keypressed === -1){
-                    await this.sleep();
-                    keypressed = this.keyboard.haskeyDown();
+                if(keypressed !== -1){
+                    this.registers.V[args[0]] = keypressed;
+                    this.continuePC(2);
+                }else{
+                    return;
                 }
-                this.registers.V[args[0]] = keypressed;
                 //cambiamos el valor de la variable Vx por el valor de la tecla pulsada, esperamos con un loop a que se pulse una tecla
-                this.continuePC(2);
                 break;
             }
             case 'LD_DT_Vx':
