@@ -10,6 +10,13 @@
   <div>
     <canvas id="canvas"></canvas>
   </div>
+  <!-- añade un boton para elegir un archivo de rom -->
+  <div class="file-input">
+    <input type="file" id="file-input" @change="onFileChange">
+    <label for="file-input">
+      <i class="fas fa-file-upload"></i>
+    </label>
+  </div>
 </template>
 
 <script>
@@ -19,31 +26,36 @@ export default {
   name: 'App',
   data() {
     return {
-      rom: '',
     }
   },
-  
-  mounted() {
-    this.runChip8();
-  },
   methods: {
-    async runChip8(){
-      const rom = await fetch('./roms/test.ch8'); //hay que meterlo en public porque fetch es especialito, en fin xD
-      const buffer = await rom.arrayBuffer();
-      const rombuffer = new Uint8Array(buffer);
+    onFileChange(e) {
+      const file = e.target.files[0];
+      console.log(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = e.target.result;
+        this.runChip8(data);
+      }
+      reader.readAsArrayBuffer(file);
+    },
+    async runChip8(data){
+      const rom = data; //hay que meterlo en public porque fetch es especialito, en fin xD
+      //const buffer = await rom.arrayBuffer();
+      const rombuffer = new Uint8Array(rom);
       const chip8 = new Chip8(rombuffer);
       chip8.running = true;
       while(chip8.running){
-        await chip8.sleep();
+        await chip8.sleep(10);
         if(chip8.registers.DT > 0)
         {
-          await chip8.sleep();
+          await chip8.sleep(10);
           chip8.registers.DT--;
         }
         if(chip8.registers.ST > 0)
         {
           chip8.soundcard.enableSound();
-          await chip8.sleep();
+          await chip8.sleep(10);
           chip8.registers.ST--;
         }
         if(chip8.registers.ST === 0){

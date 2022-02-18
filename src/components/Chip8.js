@@ -22,6 +22,7 @@ export class Chip8{
         this.soundcard = new SoundCard();
         this.disassembler = new Disassembler();
         this.running = false;
+        this.keytimer = 0;
     }
 
     sleep(ms = TIMER60HZ){
@@ -223,13 +224,7 @@ export class Chip8{
                 this.continuePC(2);
                 break;
             case 'LD_Vx_K':{
-                let keypressed = this.keyboard.haskeyDown();
-                if(keypressed !== -1){
-                    this.registers.V[args[0]] = keypressed;
-                    this.continuePC(2);
-                }else{
-                    return;
-                }
+                this.keypress(args[0]);
                 //cambiamos el valor de la variable Vx por el valor de la tecla pulsada, esperamos con un loop a que se pulse una tecla
                 break;
             }
@@ -285,4 +280,11 @@ export class Chip8{
             }
         }
     }
+    async keypress(arg){
+        //mirar funciones de teclado para comprobar mas tiempo si das al boton
+        if(this.keyboard.haskeyDown()){
+            this.registers.V[arg] = this.keyboard.haskeyDown();
+            this.continuePC(2);
+        }
+    }  
 }

@@ -7,7 +7,7 @@ export class Keyboard{
         //pasa una funcion de flecha que recibe el evento
         document.addEventListener('keyup',(event) => this.keyup(event.key));
     }
-    keydown(key){
+    async keydown(key){
         
         const keyIndex = keymap.findIndex((mapkey) => mapkey === key.toLowerCase());
         //se pasa el evento con () se compara el valor del evento (mapkey) con el valor del evento key, si son iguales se retorna el indice
@@ -18,9 +18,10 @@ export class Keyboard{
             console.log(this.keys);
         }
     }
-    keyup(key){
+    async keyup(key){
         const keyIndex = keymap.findIndex((mapkey) => mapkey === key.toLowerCase());
         //busca el indice en el array que sea igual al key
+        await this.sleep(40);
         if(keyIndex > -1){
             this.keys[keyIndex] = false;
         }
@@ -33,5 +34,9 @@ export class Keyboard{
     haskeyDown(){
         //funcion para saber si hay alguna tecla presionada
         return this.keys.findIndex((key) => key);
+    }
+
+    sleep(ms = 15){
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 }
